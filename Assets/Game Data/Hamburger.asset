@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e5e59f3c8c2e224e89158c292cabe88, type: 3}
   m_Name: Hamburger
   m_EditorClassIdentifier: 
-  menuName: "\u6C49\u5821\u5305"
+  menuName: "\u666E\u901A\u6C49\u5821\u5305"
   recipe: 010000000300000007000000
