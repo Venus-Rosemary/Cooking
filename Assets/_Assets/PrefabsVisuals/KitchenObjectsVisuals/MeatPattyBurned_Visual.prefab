@@ -45,7 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 73787e1552326aa4daf34ff5e68ac782, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _type: 6
+  _type: 8
   _sprite: {fileID: 21300000, guid: 713ea9afa60dd6e4ebf6503a33e8cc99, type: 3}
   _objName: "\u70E4\u7CCA\u7684\u8089"
 --- !u!1001 &6759599153453497129

@@ -7,14 +7,14 @@ public class UIPositionManager : MonoBehaviour
     [SerializeField] private float spacing = 200f; // UI之间的间距
     [SerializeField] private float animationDuration = 0.5f; // 动画持续时间
     [SerializeField] private Ease moveEase = Ease.OutQuart; // 移动动画的缓动类型
-
+    [SerializeField] private Transform oneMenus;
     private List<RectTransform> activeUIs = new List<RectTransform>();
     private Vector2 basePosition; // 第一个UI的基准位置
 
     private void Awake()
     {
         // 记录基准位置（第一个UI的位置）
-        basePosition = transform.position;
+        basePosition = oneMenus.position; //transform.position;
     }
 
     // 添加新UI到队列末尾

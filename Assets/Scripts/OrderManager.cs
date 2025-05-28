@@ -27,7 +27,7 @@ namespace ChaosKitchen
         /// <summary>
         /// 所有随机生成的菜单
         /// </summary>
-        private List<Recipe> _menu = new(5);
+        [SerializeField] private List<Recipe> _menu = new(5);
 
         public static OrderManager Instance { get; private set; }
 
@@ -101,15 +101,44 @@ namespace ChaosKitchen
 
                 if (foods.Count == types.Count)
                 {
-                    for (int j = 0; j < types.Count; j++)
+                    // 创建字典来统计每种食材的数量
+                    Dictionary<KitchenObjectType, int> recipeCount = new Dictionary<KitchenObjectType, int>();
+                    Dictionary<KitchenObjectType, int> foodCount = new Dictionary<KitchenObjectType, int>();
+
+                    // 统计配方中每种食材的数量
+                    foreach (var type in types)
                     {
-                        if (!foods.Contains(types[j])) { break; }
+                        if (!recipeCount.ContainsKey(type))
+                            recipeCount[type] = 0;
+                        recipeCount[type]++;
                     }
 
-                    _orderUI.HideRecipe(_menu[i].menuName);
-                    _menu.Remove(recipe);
-                    SuccessNum += 1;
-                    return true;
+                    // 统计玩家盘子中每种食材的数量
+                    foreach (var type in foods)
+                    {
+                        if (!foodCount.ContainsKey(type))
+                            foodCount[type] = 0;
+                        foodCount[type]++;
+                    }
+
+                    // 检查每种食材的数量是否匹配
+                    bool isMatch = true;
+                    foreach (var pair in recipeCount)
+                    {
+                        if (!foodCount.ContainsKey(pair.Key) || foodCount[pair.Key] != pair.Value)
+                        {
+                            isMatch = false;
+                            break;
+                        }
+                    }
+
+                    if (isMatch)
+                    {
+                        _orderUI.HideRecipe(_menu[i].menuName);
+                        _menu.Remove(recipe);
+                        SuccessNum += 1;
+                        return true;
+                    }
                 }
             }
             return false;

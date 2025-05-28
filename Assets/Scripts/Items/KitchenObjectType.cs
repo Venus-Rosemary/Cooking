@@ -9,9 +9,19 @@ namespace ChaosKitchen.Items
         None,
 
         /// <summary>
+        /// 面团
+        /// </summary>
+        Flour,
+
+        /// <summary>
         /// 面包
         /// </summary>
         Bread,
+
+        /// <summary>
+        /// 烤焦的面包
+        /// </summary>
+        CharredBread,
 
         /// <summary>
         /// 蔬菜

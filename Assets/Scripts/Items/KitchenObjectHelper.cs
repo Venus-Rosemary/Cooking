@@ -48,6 +48,53 @@ namespace ChaosKitchen.Items
         }
 
         /// <summary>
+        /// 判断一个物品是否能进行烘焙
+        /// </summary>
+        public static bool CanBake(KitchenObjectType kitchenObjectType)
+        {
+            switch (kitchenObjectType)
+            {
+                case KitchenObjectType.Flour: return true;
+                case KitchenObjectType.Bread: return true;
+                case KitchenObjectType.CharredBread: return true;
+            }
+            return false;
+        }
+
+        public static CookState GetCookFlourState(KitchenObjectType kitchenObjectType)
+        {
+            switch (kitchenObjectType)
+            {
+                case KitchenObjectType.Flour: return CookState.Uncooked;
+                case KitchenObjectType.Bread: return CookState.Cooked;
+                case KitchenObjectType.CharredBread: return CookState.Burned;
+            }
+
+            return CookState.Uncooked;
+        }
+
+        public static float GetCookFlourTime(KitchenObjectType kitchenObjectType, int stageOneTime, int stageTwoTime)
+        {
+            switch (kitchenObjectType)
+            {
+                case KitchenObjectType.Flour: return stageOneTime;
+                case KitchenObjectType.Bread: return stageTwoTime;
+            }
+            return 0;
+        }
+
+        public static KitchenObjectType GetNextCookStateKitchenObjectFlourType(KitchenObjectType kitchenObjectType)
+        {
+            switch (kitchenObjectType)
+            {
+                case KitchenObjectType.Flour: return KitchenObjectType.Bread;
+                case KitchenObjectType.Bread: return KitchenObjectType.CharredBread;
+            }
+            return KitchenObjectType.None;
+        }
+
+
+        /// <summary>
         /// 判断一个物品是否能进行烹饪
         /// </summary>
         public static bool CanCook(KitchenObjectType kitchenObjectType)
@@ -60,6 +107,7 @@ namespace ChaosKitchen.Items
             }
             return false;
         }
+
 
         /// <summary>
         /// 获取食物的烹饪状态
@@ -79,12 +127,12 @@ namespace ChaosKitchen.Items
         /// <summary>
         /// 获取每种可以进行烹饪的食物的烹饪时间
         /// </summary>
-        public static float GetCookTime(KitchenObjectType kitchenObjectType)
+        public static float GetCookTime(KitchenObjectType kitchenObjectType, int stageOneTime, int stageTwoTime)
         {
             switch (kitchenObjectType)
             {
-                case KitchenObjectType.MeatPattyCooked: return 2;
-                case KitchenObjectType.MeatPattyUncooked: return 3;
+                case KitchenObjectType.MeatPattyCooked: return stageOneTime;
+                case KitchenObjectType.MeatPattyUncooked: return stageTwoTime;
             }
             return 0;
         }

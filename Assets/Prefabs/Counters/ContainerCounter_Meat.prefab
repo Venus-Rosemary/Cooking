@@ -223,7 +223,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _selected: {fileID: 2322155973577212856}
   _placePoint: {fileID: 2322155973577212857}
-  _storeType: 8
+  _storeType: 10
   _animator: {fileID: 4599297708821237523}
 --- !u!1001 &7537550000487259350
 PrefabInstance:

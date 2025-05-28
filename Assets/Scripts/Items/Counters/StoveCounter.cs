@@ -10,6 +10,8 @@ namespace ChaosKitchen.Items
         [SerializeField] private Canvas _canvas;
         [SerializeField] private Image _processImg;
         [SerializeField] private GameObject _warnUI;
+        [SerializeField] private int stageOneTime = 0;
+        [SerializeField] private int stageTwoTime = 0;
         private float _cookTime;
         private float _needCookTime;
         private CookState _cookState;
@@ -64,7 +66,7 @@ namespace ChaosKitchen.Items
 
                 //初始化放入的食物的烹饪状态
                 _cookState = KitchenObjectHelper.GetCookState(PlaceKitchenObject.KitchenObjectType);
-                _needCookTime = KitchenObjectHelper.GetCookTime(PlaceKitchenObject.KitchenObjectType);
+                _needCookTime = KitchenObjectHelper.GetCookTime(PlaceKitchenObject.KitchenObjectType, stageOneTime, stageTwoTime);
 
                 //显示烹饪效果
                 if (_cookState != CookState.Burned) { ShowCookingEffect(); }
@@ -108,7 +110,7 @@ namespace ChaosKitchen.Items
             //进入下一个状态
             _cookState = (CookState)((int)_cookState + 1);
             _cookTime = 0;
-            _needCookTime = KitchenObjectHelper.GetCookTime(PlaceKitchenObject.KitchenObjectType);
+            _needCookTime = KitchenObjectHelper.GetCookTime(PlaceKitchenObject.KitchenObjectType, stageOneTime, stageTwoTime);
 
             //更换烹饪食物状态
             KitchenObject before = PlaceKitchenObject;
