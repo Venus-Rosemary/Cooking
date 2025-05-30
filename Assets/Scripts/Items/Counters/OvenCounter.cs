@@ -106,6 +106,18 @@ namespace ChaosKitchen.Items
                     _processImg.color = new Color(0.615f, 1, 0.345f, 1);
                 }
             }
+
+            //当玩家手里有餐盘同时桌上放有食物时可以将桌上的食物放入到餐盘中
+            else if (hold != null && hold.KitchenObjectType == KitchenObjectType.Plate && PlaceKitchenObject != null && PlaceKitchenObject.KitchenObjectType != KitchenObjectType.Plate)
+            {
+                PlateContainer container = hold.GetComponent<PlateContainer>();
+                TransferTo(container);
+
+                AudioManager.Instance.PlayAudio(EventAudio.Pickup);
+
+                HideBakingEffect();
+            }
+
             else if (hold == null)
             {
                 // 玩家手上没有物品时，从烤箱取出物品

@@ -86,6 +86,17 @@ namespace ChaosKitchen.Items
 
             }
 
+            //当玩家手里有餐盘同时桌上放有食物时可以将桌上的食物放入到餐盘中
+            else if (hold != null && hold.KitchenObjectType == KitchenObjectType.Plate && PlaceKitchenObject != null && PlaceKitchenObject.KitchenObjectType != KitchenObjectType.Plate)
+            {
+                PlateContainer container = hold.GetComponent<PlateContainer>();
+                TransferTo(container);
+
+                AudioManager.Instance.PlayAudio(EventAudio.Pickup);
+
+                HideCookingEffect();
+            }
+
             //如果当前放有物品则将物品给玩家（前提是玩家没有手持物）
             else if (hold == null)
             {

@@ -51,6 +51,15 @@ namespace ChaosKitchen.Items
                     AudioManager.Instance.PlayAudio(EventAudio.Drop);
                 }
             }
+            //当玩家手里有餐盘同时桌上放有食物时可以将桌上的食物放入到餐盘中
+            else if (player.HoldKitchenObj != null && player.HoldKitchenObj.KitchenObjectType == KitchenObjectType.Plate && PlaceKitchenObject != null && PlaceKitchenObject.KitchenObjectType != KitchenObjectType.Plate)
+            {
+                PlateContainer container = player.HoldKitchenObj.GetComponent<PlateContainer>();
+                TransferTo(container);
+
+                AudioManager.Instance.PlayAudio(EventAudio.Pickup);
+            }
+
             //如果当前放有物品则将物品给玩家（前提是玩家没有手持物）
             else if (player.HoldKitchenObj == null)
             {
@@ -70,6 +79,7 @@ namespace ChaosKitchen.Items
             {
                 if (SetCutProcess(++_cutCount))
                 {
+                    HideUI();
                     KitchenObject before = PlaceKitchenObject;
                     //将之前的物品返回池中
                     KitchenManager.Instance.Put(before);
