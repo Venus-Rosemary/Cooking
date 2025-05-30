@@ -88,13 +88,23 @@ namespace ChaosKitchen.Items
                 // 玩家手持可烘焙物品且烤箱为空时，放置物品
                 player.TransferTo(this);
 
+                _bakeTime = 0;
+
                 // 设置烘焙状态和所需时间
                 _bakeState = KitchenObjectHelper.GetCookFlourState(PlaceKitchenObject.KitchenObjectType);
                 _needBakeTime = KitchenObjectHelper.GetCookFlourTime(PlaceKitchenObject.KitchenObjectType, stageOneTime, stageTwoTime);
 
                 if (_bakeState != CookState.Burned) { ShowBakingEffect(); }
 
-                _processImg.color = new Color(0.615f, 1, 0.345f, 1); // 设置进度条为绿色
+                if (_bakeState == CookState.Cooked)
+                {
+                    _warnUI.SetActive(true);
+                    _processImg.color = new Color(1, 0.35f, 0.14f, 1);
+                }
+                else
+                {
+                    _processImg.color = new Color(0.615f, 1, 0.345f, 1);
+                }
             }
             else if (hold == null)
             {

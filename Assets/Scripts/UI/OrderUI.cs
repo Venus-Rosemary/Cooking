@@ -1,7 +1,10 @@
 ﻿using ChaosKitchen.Items;
+using DG.Tweening;
 using System.Collections.Generic;
 using TMPro;
+using UnityEditor;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.UI;
 
 namespace ChaosKitchen.UI
@@ -10,6 +13,9 @@ namespace ChaosKitchen.UI
     {
         [SerializeField] private Transform _showMenus;
 
+        [SerializeField] private Transform oriPoint;
+
+        [SerializeField] private List<TMP_Text> menuName1=new List<TMP_Text>() { };
         //菜单UI生成
         public void ShowRecipe(Recipe recipe)
         {
@@ -30,6 +36,8 @@ namespace ChaosKitchen.UI
             TMP_Text menuNameTxt = menu.GetComponentInChildren<TMP_Text>();
             menuNameTxt.text = recipe.menuName;
 
+            menuName1.Add(menuNameTxt);
+
             List<KitchenObjectType> icons = recipe.recipe;
             Transform menus = menu.GetChild(0);
 
@@ -45,23 +53,44 @@ namespace ChaosKitchen.UI
 
         public void HideRecipe(string menuName)
         {
-            for (int i = 0; i < _showMenus.childCount; i++)
+            for (int i = 0; i < menuName1.Count; i++)
             {
-                Transform menu = _showMenus.GetChild(i);
-                if (menu.gameObject.activeSelf)
+                Transform menu1 = menuName1[i].transform.parent;
+                if (menu1.gameObject.activeSelf)
                 {
-                    TMP_Text menuNameTxt = menu.GetComponentInChildren<TMP_Text>();
+                    TMP_Text menuNameTxt = menuName1[i];
                     if (menuNameTxt.text == menuName)
                     {
-                        Transform meunIcons = menu.GetChild(0);
+                        Transform meunIcons = menu1.GetChild(0);
                         for (int j = 0; j < meunIcons.childCount; j++)
                         {
                             meunIcons.GetChild(j).gameObject.SetActive(false);
                         }
-                        menu.gameObject.SetActive(false);
+
+                        // 使用DOTween创建动画
+                        menu1.transform.DOMoveY(oriPoint.position.y, 0.5f)
+                            .SetEase(Ease.OutBack);
+                        DOVirtual.DelayedCall(0.5f, () => menu1.gameObject.SetActive(false));
+                        menuName1.Remove(menuNameTxt);
                         break;
                     }
                 }
+
+                //Transform menu = _showMenus.GetChild(i);
+                //if (menu.gameObject.activeSelf)
+                //{
+                //    TMP_Text menuNameTxt = menu.GetComponentInChildren<TMP_Text>();
+                //    if (menuNameTxt.text == menuName)
+                //    {
+                //        Transform meunIcons = menu.GetChild(0);
+                //        for (int j = 0; j < meunIcons.childCount; j++)
+                //        {
+                //            meunIcons.GetChild(j).gameObject.SetActive(false);
+                //        }
+                //        menu.gameObject.SetActive(false);
+                //        break;
+                //    }
+                //}
             }
         }
     }

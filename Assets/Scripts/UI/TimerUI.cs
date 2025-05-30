@@ -15,6 +15,7 @@ namespace ChaosKitchen.UI
 
         private bool _isStartGame;
         private int _timer;
+        private Coroutine _timerCoroutine;
 
         public int Time { set => TIMER = value; }
 
@@ -37,9 +38,23 @@ namespace ChaosKitchen.UI
 
         private void StartGame()
         {
+            Debug.Log("开始计时");
             _timer = TIMER;
             _isStartGame = true;
-            StartCoroutine(Timer());
+            if (_timerCoroutine!=null)
+            {
+                //重置
+                _timer = TIMER;
+                _timerImg.fillAmount = 0;
+                _timerTxt.text = TIMER.ToString();
+                _isStartGame = false;
+
+                StopCoroutine( _timerCoroutine );
+            }
+            if (gameObject.activeSelf)
+            {
+                _timerCoroutine = StartCoroutine(Timer());
+            }
         }
 
         private IEnumerator Timer()

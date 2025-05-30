@@ -40,9 +40,12 @@ namespace ChaosKitchen.Items
                 else if (_container != null && hold != null && hold.KitchenObjectType != KitchenObjectType.Plate)
                 {
                     //检查当前玩家放的食物是否符合食谱
-                    _container.AddFood(player.HoldKitchenObj);
+                    //_container.AddFood(player.HoldKitchenObj);
                     //将玩家的食物进行回收，因为餐盘容器中已经有了这个食物
-                    player.TransferTo(KitchenManager.Instance);
+
+                    PlateContainer container = _container.GetComponent<PlateContainer>();
+
+                    player.TransferTo(container);
 
                     AudioManager.Instance.PlayAudio(EventAudio.Drop);
                 }

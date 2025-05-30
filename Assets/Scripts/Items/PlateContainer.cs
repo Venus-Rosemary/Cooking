@@ -19,19 +19,6 @@ namespace ChaosKitchen.Items
         /// <returns>是否添加成功</returns>
         public void AddFood(KitchenObject food)
         {
-            // 检查是否已经有面包类食物
-            bool hasBreadType = _foods.Any(f => f == KitchenObjectType.Flour ||
-                                              f == KitchenObjectType.Bread ||
-                                              f == KitchenObjectType.CharredBread);
-
-            // 如果要添加的是面包类食物，且餐盘中已有面包类食物，则不允许添加
-            if ((food.KitchenObjectType == KitchenObjectType.Flour ||
-                 food.KitchenObjectType == KitchenObjectType.Bread ||
-                 food.KitchenObjectType == KitchenObjectType.CharredBread) && hasBreadType)
-            {
-                return;
-            }
-
             KitchenObject kitchenObject = _foodTemplate.Find(k => k.KitchenObjectType == food.KitchenObjectType);
             kitchenObject?.gameObject.SetActive(true);
             _plateUI.ShowIcon(food.Icon);
@@ -63,12 +50,31 @@ namespace ChaosKitchen.Items
 
         public bool Place(KitchenObject transferObj)
         {
-            if (transferObj.KitchenObjectType != KitchenObjectType.Plate)
+            // 检查要放入的物品是否在 _foodTemplate 中定义
+            bool isValidFood = _foodTemplate.Any(k => k.KitchenObjectType == transferObj.KitchenObjectType);
+
+            // 检查是否已经有面包类食物
+            bool hasBreadType = _foods.Any(f => f == KitchenObjectType.Flour ||
+                                              f == KitchenObjectType.Bread ||
+                                              f == KitchenObjectType.CharredBread);
+
+            // 如果要添加的是面包类食物，且餐盘中已有面包类食物，则不允许添加
+            if ((transferObj.KitchenObjectType == KitchenObjectType.Flour ||
+                 transferObj.KitchenObjectType == KitchenObjectType.Bread ||
+                 transferObj.KitchenObjectType == KitchenObjectType.CharredBread) && hasBreadType)
             {
-                KitchenManager.Instance.Put(transferObj);
-                AddFood(transferObj);
-                return true;
+                return false;
             }
+            else
+            {
+                if (isValidFood)
+                {
+                    KitchenManager.Instance.Put(transferObj);
+                    AddFood(transferObj);
+                    return true;
+                }
+            }
+            // 如果不是有效的食物类型，则不放入盘子
             return false;
         }
     }

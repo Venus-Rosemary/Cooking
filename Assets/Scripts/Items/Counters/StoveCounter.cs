@@ -64,6 +64,8 @@ namespace ChaosKitchen.Items
             {
                 player.TransferTo(this);
 
+                _cookTime = 0;
+
                 //初始化放入的食物的烹饪状态
                 _cookState = KitchenObjectHelper.GetCookState(PlaceKitchenObject.KitchenObjectType);
                 _needCookTime = KitchenObjectHelper.GetCookTime(PlaceKitchenObject.KitchenObjectType, stageOneTime, stageTwoTime);
@@ -72,7 +74,16 @@ namespace ChaosKitchen.Items
                 if (_cookState != CookState.Burned) { ShowCookingEffect(); }
 
                 //初始化进度条颜色
-                _processImg.color = new Color(0.615f, 1, 0.345f, 1);
+                if (_cookState== CookState.Cooked)
+                {
+                    _warnUI.SetActive(true);
+                    _processImg.color = new Color(1, 0.35f, 0.14f, 1);
+                }
+                else
+                {
+                    _processImg.color = new Color(0.615f, 1, 0.345f, 1);
+                }
+
             }
 
             //如果当前放有物品则将物品给玩家（前提是玩家没有手持物）

@@ -1,0 +1,131 @@
+using UnityEngine;
+using System.Collections.Generic;
+using ChaosKitchen.UI;
+
+namespace ChaosKitchen
+{
+    public class LevelManager : MonoBehaviour
+    {
+        public static LevelManager Instance { get; private set; }
+
+        [System.Serializable]
+        public class LevelConfig
+        {
+            public GameObject[] activeGameObjects;    // 该关卡需要激活的物体
+            public GameObject[] activeUIObjects;      // 该关卡需要激活的UI
+            public bool useTimer;                     // 是否使用倒计时
+            public float levelTime;                   // 关卡时间（如果使用倒计时）
+            [Header("数量为0代表不使用数量限制生成")]
+            public int orderCount;                    // 订单数量
+        }
+
+        [SerializeField] private LevelConfig[] _levels;           // 关卡配置数组
+        [SerializeField] private TimerUI _timerUI;               // 计时器UI引用
+        //[SerializeField] private GameObject _gameOverUI;         // 游戏结束UI
+        //[SerializeField] private GameObject _levelCompleteUI;    // 关卡完成UI
+
+        private int _currentLevel = 0;                           // 当前关卡
+        private int _completedOrders = 0;                        // 已完成订单数
+        private bool _isLevelActive = false;                     // 关卡是否激活
+
+        private void Awake()
+        {
+            if (Instance == null)
+            {
+                Instance = this;
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
+        }
+
+        private void Start()
+        {
+            EventManager.Instance.RegisterEvent(GameEvent.OrderCompleted, OnOrderCompleted);
+            EventManager.Instance.RegisterEvent(GameEvent.GameOver, OnGameOver);
+        }
+
+        public void StartLevel(int levelIndex)
+        {
+            if (levelIndex >= _levels.Length) return;
+
+            _currentLevel = levelIndex;
+            _completedOrders = 0;
+            _isLevelActive = true;
+
+            // 设置关卡配置
+            LevelConfig config = _levels[_currentLevel];
+
+            // 激活相应的物体和UI
+            foreach (GameObject obj in config.activeGameObjects)
+            {
+                obj.SetActive(true);
+            }
+            foreach (GameObject ui in config.activeUIObjects)
+            {
+                ui.SetActive(true);
+            }
+
+            // 设置订单管理器
+            OrderManager.Instance.SetMaxOrders(config.orderCount);
+
+            // 设置计时器
+            if (config.useTimer)
+            {
+                _timerUI.gameObject.SetActive(true);
+                _timerUI.Time = (int)config.levelTime;
+            }
+            else
+            {
+                _timerUI.gameObject.SetActive(false);
+            }
+        }
+
+        private void OnOrderCompleted()
+        {
+            if (!_isLevelActive) return;
+
+            _completedOrders++;
+            LevelConfig config = _levels[_currentLevel];
+
+            // 检查是否完成所有订单
+            if (_completedOrders >= config.orderCount)
+            {
+                CompleteLevelSuccess();
+            }
+        }
+
+        private void OnGameOver()
+        {
+            if (!_isLevelActive) return;
+
+            _isLevelActive = false;
+            EventManager.Instance.TriggerEvent(GameEvent.GameOver);
+        }
+
+        private void CompleteLevelSuccess()
+        {
+            _isLevelActive = false;
+            EventManager.Instance.TriggerEvent(GameEvent.GameOver);
+        }
+
+        public void RestartLevel()
+        {
+            StartLevel(_currentLevel);
+        }
+
+        public void NextLevel()
+        {
+            StartLevel(_currentLevel + 1);
+        }
+
+        private void OnDestroy()
+        {
+            if (Instance == this)
+            {
+                Instance = null;
+            }
+        }
+    }
+}

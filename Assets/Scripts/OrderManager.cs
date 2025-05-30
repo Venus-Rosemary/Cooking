@@ -29,6 +29,8 @@ namespace ChaosKitchen
         /// </summary>
         [SerializeField] private List<Recipe> _menu = new(5);
 
+        // 最大订单数量变量
+        private int _maxOrderCount;
         public static OrderManager Instance { get; private set; }
 
         private void Awake()
@@ -70,7 +72,7 @@ namespace ChaosKitchen
 
         private void Update()
         {
-            if (_isStartGame && _maxMenuCount > _menu.Count)
+            if (_isStartGame && _menu.Count < _maxMenuCount && (_maxOrderCount <= 0 || SuccessNum + _menu.Count < _maxOrderCount))
             {
                 _timer += Time.deltaTime;
                 if (_timer >= _interval)
@@ -79,6 +81,21 @@ namespace ChaosKitchen
                     AutoGenerateMenu();
                 }
             }
+
+            // 检查是否达到订单完成条件
+            if (_maxOrderCount > 0 && SuccessNum >= _maxOrderCount)
+            {
+                EventManager.Instance.TriggerEvent(GameEvent.OrderCompleted);
+            }
+        }
+
+        /// <summary>
+        /// 设置最大订单数量
+        /// </summary>
+        /// <param name="maxOrders">最大订单数</param>
+        public void SetMaxOrders(int maxOrders)
+        {
+            _maxOrderCount = maxOrders;
         }
 
         //生成菜单
@@ -87,6 +104,7 @@ namespace ChaosKitchen
             Recipe recipe = _recipes[Random.Range(0, _recipes.Count)];
             _orderUI.ShowRecipe(recipe);
             _menu.Add(recipe);
+            //得按照菜单来重新排序
         }
 
         /// <summary>
@@ -101,6 +119,9 @@ namespace ChaosKitchen
 
                 if (foods.Count == types.Count)
                 {
+                    Debug.Log("第几个菜："+i);
+                    Debug.Log("手上菜的数量：" + foods.Count + "菜单菜的数量：" + types.Count);
+
                     // 创建字典来统计每种食材的数量
                     Dictionary<KitchenObjectType, int> recipeCount = new Dictionary<KitchenObjectType, int>();
                     Dictionary<KitchenObjectType, int> foodCount = new Dictionary<KitchenObjectType, int>();

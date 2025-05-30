@@ -90,5 +90,10 @@ namespace ChaosKitchen
         /// 结束重新绑定按钮
         /// </summary>
         RebindKey_End,
+
+        /// <summary>
+        /// 完成订单
+        /// </summary>
+        OrderCompleted,
     }
 }

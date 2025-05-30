@@ -62,6 +62,7 @@ namespace ChaosKitchen.UI
 
             _countTime = 3;
             _numberTxt.text = _countTime.ToString();
+            LevelManager.Instance.StartLevel(0);
             EventManager.Instance.TriggerEvent(GameEvent.StartGame);
             gameObject.SetActive(false);
             _startGameBtn.transform.parent.gameObject.SetActive(true);

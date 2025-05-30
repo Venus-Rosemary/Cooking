@@ -92,15 +92,16 @@ namespace ChaosKitchen
         private void Update()
         {
             Interact();
+            if (_isStartGame)
+            {
+                //Move();
+                HandleMovement();
+            }
         }
 
         private void FixedUpdate()
         {
-            if (_isStartGame) 
-            { 
-                //Move();
-                HandleMovement();
-            }
+
         }
 
         private void Interact()

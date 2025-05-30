@@ -1,4 +1,6 @@
 ﻿
+using UnityEngine;
+
 namespace ChaosKitchen.Items
 {
     public sealed class TrashCounter : BaseCounter

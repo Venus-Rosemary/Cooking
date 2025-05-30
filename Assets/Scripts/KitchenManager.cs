@@ -36,7 +36,7 @@ namespace ChaosKitchen
         /// </summary>
         public void Put(KitchenObject kitchenObject)
         {
-            kitchenObject.transform.SetParent(transform);
+            kitchenObject.transform.SetParent(transform);//这是个对象池
             kitchenObject.gameObject.SetActive(false);
             _pool.Add(kitchenObject);
         }
