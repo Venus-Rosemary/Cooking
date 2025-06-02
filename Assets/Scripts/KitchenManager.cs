@@ -77,5 +77,13 @@ namespace ChaosKitchen
             return true;
         }
 
+        public KitchenObject GetKitchenObject(KitchenObjectType extra)
+        {
+            KitchenObject prefab = _prefabs.Find(obj => obj.KitchenObjectType == extra);
+            return prefab;
+
+            throw new System.Exception($"不存在指定类型[{extra}]的物品!");
+        }
+
     }
 }

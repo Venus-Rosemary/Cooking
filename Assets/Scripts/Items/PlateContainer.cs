@@ -11,7 +11,7 @@ namespace ChaosKitchen.Items
         [SerializeField] private List<KitchenObject> _foodTemplate;
 
         //当前玩家上的菜
-        [SerializeField] private List<KitchenObjectType> _foods = new(6);
+        [SerializeField] private List<KitchenObjectType> _foods = new(7);
 
         /// <summary>
         /// 添加食谱中指定的食物
@@ -50,6 +50,10 @@ namespace ChaosKitchen.Items
 
         public bool Place(KitchenObject transferObj)
         {
+            if (_foods.Count>=7)
+            {
+                return false;
+            }
             // 检查要放入的物品是否在 _foodTemplate 中定义
             bool isValidFood = _foodTemplate.Any(k => k.KitchenObjectType == transferObj.KitchenObjectType);
 

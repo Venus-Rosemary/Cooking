@@ -162,6 +162,11 @@ namespace ChaosKitchen
         /// ÉÏ²ËÊ§°ÜµÄÉùÒô
         /// </summary>
         Fail,
+
+        /// <summary>
+        /// ºæ¿¾µÄÉùÒô
+        /// </summary>
+        Baking,
     }
 }
 

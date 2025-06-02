@@ -8,7 +8,9 @@ namespace ChaosKitchen.UI
     public sealed class StartUI : MonoBehaviour
     {
         [SerializeField] private TMP_Text _numberTxt;
-        [SerializeField] private Button _startGameBtn;
+        [SerializeField] private Button _startGameBtn1;
+        [SerializeField] private Button _startGameBtn2;
+        [SerializeField] private Button _startGameBtn3;
         [SerializeField] private Button _tutorialBtn;
         [SerializeField] private Button _settingBtn;
 
@@ -16,10 +18,13 @@ namespace ChaosKitchen.UI
         [SerializeField] private TutorialUI _tutorialUI;
 
         private int _countTime = 3;
+        private int _level;
 
         private void Start()
         {
-            _startGameBtn.onClick.AddListener(StartTimer);
+            _startGameBtn1.onClick.AddListener(StartTimer);
+            _startGameBtn2.onClick.AddListener(StartTimer);
+            _startGameBtn3.onClick.AddListener(StartTimer);
             _tutorialBtn.onClick.AddListener(OpenTutorialUI);
             _settingBtn.onClick.AddListener(OpenSettingUI);
             EventManager.Instance.RegisterEvent(GameEvent.RestartGame, RestartGame);
@@ -42,7 +47,7 @@ namespace ChaosKitchen.UI
 
         private void StartTimer()
         {
-            _startGameBtn.transform.parent.gameObject.SetActive(false);
+            _startGameBtn1.transform.parent.gameObject.SetActive(false);
             gameObject.SetActive(true);
             StartCoroutine(StartCountdown());
         }
@@ -62,10 +67,16 @@ namespace ChaosKitchen.UI
 
             _countTime = 3;
             _numberTxt.text = _countTime.ToString();
-            LevelManager.Instance.StartLevel(0);
+            LevelManager.Instance.StartLevel(_level);
             EventManager.Instance.TriggerEvent(GameEvent.StartGame);
             gameObject.SetActive(false);
-            _startGameBtn.transform.parent.gameObject.SetActive(true);
+            //重置
+            _startGameBtn1.transform.parent.gameObject.SetActive(true);
+        }
+
+        public void SetCurrentLevel(int a)
+        {
+            _level = a;
         }
 
     }

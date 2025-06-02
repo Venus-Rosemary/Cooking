@@ -129,6 +129,8 @@ namespace ChaosKitchen.Items
 
         private void EnterNextCookState()
         {
+
+            AudioManager.Instance.PlayAudio(EventAudio.Warn);
             //进入下一个状态
             _cookState = (CookState)((int)_cookState + 1);
             _cookTime = 0;

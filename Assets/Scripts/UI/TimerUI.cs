@@ -10,7 +10,7 @@ namespace ChaosKitchen.UI
     {
         [SerializeField] private Image _timerImg;
         [SerializeField] private TMP_Text _timerTxt;
-        [Range(60, 360)]
+        [Range(10, 360)]
         [SerializeField] private int TIMER = 360;
 
         private bool _isStartGame;
@@ -47,7 +47,6 @@ namespace ChaosKitchen.UI
                 _timer = TIMER;
                 _timerImg.fillAmount = 0;
                 _timerTxt.text = TIMER.ToString();
-                _isStartGame = false;
 
                 StopCoroutine( _timerCoroutine );
             }

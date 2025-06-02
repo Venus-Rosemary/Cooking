@@ -37,7 +37,7 @@ namespace ChaosKitchen.Items
             _isStartGame = false;
             if (PlaceKitchenObject != null && _bakeState != CookState.Burned)
                 //关闭声音
-                AudioManager.Instance.StopAudio(EventAudio.Sizzle);
+                AudioManager.Instance.StopAudio(EventAudio.Baking);
         }
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace ChaosKitchen.Items
             _isStartGame = true;
             if (PlaceKitchenObject != null && _bakeState != CookState.Burned)
                 //播放声音
-                AudioManager.Instance.PlayAudio(EventAudio.Sizzle);
+                AudioManager.Instance.PlayAudio(EventAudio.Baking);
         }
 
         /// <summary>
@@ -157,6 +157,8 @@ namespace ChaosKitchen.Items
         /// </summary>
         private void EnterNextBakeState()
         {
+
+            AudioManager.Instance.PlayAudio(EventAudio.Warn);
             _bakeState = (CookState)((int)_bakeState + 1);
             _bakeTime = 0;
             _needBakeTime = KitchenObjectHelper.GetCookFlourTime(PlaceKitchenObject.KitchenObjectType, stageOneTime, stageTwoTime);
@@ -188,7 +190,7 @@ namespace ChaosKitchen.Items
             SetGameObjectActive(_canvas.gameObject, true);
             SetGameObjectActive(_showBaking, true);
             SetGameObjectActive(_heatParticles, true);
-            AudioManager.Instance.PlayAudio(EventAudio.Sizzle);
+            AudioManager.Instance.PlayAudio(EventAudio.Baking);
         }
 
         /// <summary>
@@ -200,7 +202,7 @@ namespace ChaosKitchen.Items
             SetGameObjectActive(_showBaking, false);
             SetGameObjectActive(_heatParticles, false);
             SetGameObjectActive(_warnUI, false);
-            AudioManager.Instance.StopAudio(EventAudio.Sizzle);
+            AudioManager.Instance.StopAudio(EventAudio.Baking);
         }
 
         /// <summary>

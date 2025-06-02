@@ -14,3 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   menuName: "\u6C99\u62C9"
   recipe: 050000000d000000
+  timeLimit: 20

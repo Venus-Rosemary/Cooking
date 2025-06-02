@@ -104,6 +104,7 @@ namespace ChaosKitchen
 
         }
 
+        //高亮交互
         private void Interact()
         {
             if (Physics.Raycast(transform.position, transform.forward, out RaycastHit hitInfo, 2f, _counterLayer))
@@ -126,40 +127,20 @@ namespace ChaosKitchen
             }
         }
 
+        //交互方法
         private void Interact(InteractiveEvent interactiveEvent)
         {
             if (Physics.Raycast(transform.position, transform.forward, out RaycastHit hitInfo, 2f, _counterLayer))
             {
                 if (hitInfo.transform.TryGetComponent(out BaseCounter counter))
                 {
-                    SelectCounter(counter);
+                    SelectCounter(counter); 
                     counter.Interact(this, interactiveEvent);
                 }
             }
         }
 
-        private void Move()
-        {
-            //获取移动输入
-            Vector3 direction = GameInput.Instance.GetPlayerMoveInput();
-            //位置移动
-            transform.position += direction * _moveSpeed * Time.deltaTime;
-            //朝向变化，对于向量插值采用圆弧方式进行插值（更加平滑）
-            transform.forward = Vector3.Slerp(transform.forward, direction, Time.deltaTime * _rotationSpeed);
-            //播放动画
-            bool isWalking = direction != Vector3.zero;
-            _animator.SetBool(WALKING, isWalking);
-
-            _playFootStepTimer += Time.deltaTime;
-            //播放声音
-            //脚步声音不要播放得太频繁
-            if (isWalking && _playFootStepTimer >= 0.13f)
-            {
-                _playFootStepTimer = 0;
-                AudioManager.Instance.PlayAudio(EventAudio.Walk);
-            }
-        }
-
+        //玩家移动
         private void HandleMovement()
         {
             Vector2 inputVector = GameInput.Instance.GetPlayerMoveInput();
