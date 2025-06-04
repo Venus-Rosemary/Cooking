@@ -17,6 +17,8 @@ namespace ChaosKitchen
         [Range(1, 10)]
         [SerializeField] private float _rotationSpeed = 6;
         [Header("柜台交互")]
+        [SerializeField] private int rayCount = 36;       // 射线条数（越多越密集）
+        [SerializeField] private float detectionRadius = 5f;  // 检测半径
         [SerializeField] private LayerMask _counterLayer;
         [Header("放置物品的点")]
         [SerializeField] private Transform _placePoint;
@@ -107,9 +109,10 @@ namespace ChaosKitchen
         //高亮交互
         private void Interact()
         {
-            if (Physics.Raycast(transform.position, transform.forward, out RaycastHit hitInfo, 2f, _counterLayer))
+            GameObject nearestObject = DetectNearestObjectAround();
+            if (nearestObject!=null)
             {
-                if (hitInfo.transform.TryGetComponent(out BaseCounter counter))
+                if (nearestObject.transform.TryGetComponent(out BaseCounter counter))
                 {
                     if (counter != _lastSelected)
                     {
@@ -130,14 +133,58 @@ namespace ChaosKitchen
         //交互方法
         private void Interact(InteractiveEvent interactiveEvent)
         {
-            if (Physics.Raycast(transform.position, transform.forward, out RaycastHit hitInfo, 2f, _counterLayer))
+            GameObject nearestObject = DetectNearestObjectAround();
+            if (nearestObject != null)
             {
-                if (hitInfo.transform.TryGetComponent(out BaseCounter counter))
+                if (nearestObject.transform.TryGetComponent(out BaseCounter counter))
                 {
                     SelectCounter(counter); 
                     counter.Interact(this, interactiveEvent);
                 }
             }
+        }
+
+        GameObject DetectNearestObjectAround()
+        {
+            float minDistance = float.MaxValue;
+            GameObject nearestGO = null;
+
+            float angleStep = 360f / rayCount;
+            Vector3 origin = transform.position;
+
+            for (int i = 0; i < rayCount; i++)
+            {
+                float angle = i * angleStep;
+                Quaternion rotation = Quaternion.AngleAxis(angle, Vector3.up); // 绕 Y 轴旋转
+                Vector3 direction = rotation * transform.forward;              // 基于角色朝向偏转
+
+                Ray ray = new Ray(origin, direction);
+
+                if (Physics.Raycast(ray, out RaycastHit hit, detectionRadius, _counterLayer))
+                {
+                    // 可视化调试用（绿色为命中，红色为最短距离那条）
+                    Debug.DrawRay(ray.origin, ray.direction * hit.distance, Color.green, 0.1f);
+
+                    if (hit.transform.gameObject != gameObject && hit.distance < minDistance)
+                    {
+                        minDistance = hit.distance;
+                        nearestGO = hit.transform.gameObject;
+                    }
+                }
+                else
+                {
+                    Debug.DrawRay(ray.origin, ray.direction * detectionRadius, Color.gray, 0.1f);
+                }
+            }
+
+            // 高亮显示最近命中的射线
+            if (nearestGO != null)
+            {
+                Vector3 nearestDir = nearestGO.transform.position - origin;
+                Debug.DrawRay(origin, nearestDir.normalized * minDistance, Color.red, 0.1f);
+            }
+
+            return nearestGO;
         }
 
         //玩家移动

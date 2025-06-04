@@ -32,11 +32,17 @@ namespace ChaosKitchen.Items.Counters
 
         protected override void GameOver()
         {
-            base.GameOver();
-            for (int i = 0; i < PlacePoint.childCount; i++)
+            _isStartGame = false;
+
+            int a = PlacePoint.childCount;
+
+            for (int j = 0; j < a; j++)
             {
-                var obj = PlacePoint.GetChild(PlacePoint.childCount - 1).GetComponent<KitchenObject>();
-                KitchenManager.Instance.Put(obj);
+                for (int i = 0; i < PlacePoint.childCount; i++)
+                {
+                    var obj = PlacePoint.GetChild(PlacePoint.childCount-1).GetComponent<KitchenObject>();
+                    KitchenManager.Instance.Put(obj);
+                }
             }
         }
 
@@ -48,6 +54,7 @@ namespace ChaosKitchen.Items.Counters
                 //如果当前放有物品则将物品给玩家（前提是玩家没有手持物）
                 if (player.HoldKitchenObj == null && PlaceKitchenObject != null)
                 {
+                    Debug.Log("拿盘子");
                     TransferTo(player);
                     AudioManager.Instance.PlayAudio(EventAudio.Pickup);
                 }

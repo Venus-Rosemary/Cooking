@@ -167,6 +167,11 @@ namespace ChaosKitchen
         /// ºæ¿¾µÄÉùÒô
         /// </summary>
         Baking,
+
+        /// <summary>
+        /// ¿Ì¶ÈµÄÉùÒô
+        /// </summary>
+        Scale,
     }
 }
 

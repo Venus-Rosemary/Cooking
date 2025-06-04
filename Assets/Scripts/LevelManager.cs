@@ -56,12 +56,12 @@ namespace ChaosKitchen
             {
                 Destroy(gameObject);
             }
+            EventManager.Instance.RegisterEvent(GameEvent.OrderCompleted, OnOrderCompleted);//检测订单是否完成对应数量
         }
 
         private void Start()
         {
-            EventManager.Instance.RegisterEvent(GameEvent.OrderCompleted, OnOrderCompleted);//检测订单是否完成对应数量
-            EventManager.Instance.RegisterEvent(GameEvent.GameOver, OnGameOver);
+
         }
 
         public void StartLevel(int levelIndex)
@@ -122,14 +122,6 @@ namespace ChaosKitchen
             {
                 CompleteLevelSuccess();
             }
-        }
-
-        private void OnGameOver()
-        {
-            if (!_isLevelActive) return;
-
-            _isLevelActive = false;
-            EventManager.Instance.TriggerEvent(GameEvent.GameOver);
         }
 
         private void CompleteLevelSuccess()

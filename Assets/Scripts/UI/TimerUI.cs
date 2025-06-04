@@ -24,6 +24,8 @@ namespace ChaosKitchen.UI
             EventManager.Instance.RegisterEvent(GameEvent.StartGame, StartGame, false);
             EventManager.Instance.RegisterEvent(GameEvent.PauseGame, PauseGame);
             EventManager.Instance.RegisterEvent(GameEvent.ContinueGame, ContinueGame);
+
+            gameObject.SetActive(false);
         }
 
         private void ContinueGame()

@@ -12,15 +12,35 @@ namespace ChaosKitchen.Items
         [SerializeField] private GameObject _warnUI;
         [SerializeField] private int stageOneTime = 0;
         [SerializeField] private int stageTwoTime = 0;
+        [SerializeField] private GameObject _progressObject;   // 进度显示物体（包含12个子物体）
         private float _cookTime;
         private float _needCookTime;
         private CookState _cookState;
+        private float _lastProgressUpdateTime;                 // 上次更新进度的时间
+        private int _currentActiveIndex;                       // 当前激活的子物体索引
+        private GameObject[] _progressSegments;                // 进度显示的子物体数组
+        private int _cookedCount;                             // 第二关烤熟次数计数
 
         private void Start()
         {
             EventManager.Instance.RegisterEvent(GameEvent.PauseGame, PauseGame);
             EventManager.Instance.RegisterEvent(GameEvent.ContinueGame, ContinueGame);
-            _canvas.transform.forward = Camera.main.transform.forward;
+
+            // 初始化进度显示子物体数组
+            if (_progressObject != null)
+            {
+                _progressSegments = new GameObject[12];
+                for (int i = 0; i < 12; i++)
+                {
+                    _progressSegments[i] = _progressObject.transform.GetChild(i).gameObject;
+                    _progressSegments[i].SetActive(false);
+                }
+            }
+        }
+
+        private void OnStartGame()
+        {
+            _cookedCount = 0;
         }
 
         private void PauseGame()
@@ -46,6 +66,7 @@ namespace ChaosKitchen.Items
             HideCookingEffect();
             _processImg.fillAmount = 0;
             _cookTime = 0;
+            _cookedCount = 0;
         }
 
         public override void Interact(PlayerController player, InteractiveEvent interactiveEvent)
@@ -63,7 +84,9 @@ namespace ChaosKitchen.Items
             if (PlaceKitchenObject == null && hold != null && KitchenObjectHelper.CanCook(hold.KitchenObjectType))
             {
                 player.TransferTo(this);
+                AudioManager.Instance.PlayAudio(EventAudio.Drop);
 
+                ReturnTaskShow();
                 _cookTime = 0;
 
                 //初始化放入的食物的烹饪状态
@@ -77,11 +100,11 @@ namespace ChaosKitchen.Items
                 if (_cookState== CookState.Cooked)
                 {
                     _warnUI.SetActive(true);
-                    _processImg.color = new Color(1, 0.35f, 0.14f, 1);
+                    SetRenderColor(true);
                 }
                 else
                 {
-                    _processImg.color = new Color(0.615f, 1, 0.345f, 1);
+                    SetRenderColor(false);
                 }
 
             }
@@ -101,13 +124,22 @@ namespace ChaosKitchen.Items
             else if (hold == null)
             {
                 TransferTo(player);
+                AudioManager.Instance.PlayAudio(EventAudio.Pickup);
                 //关闭烹饪效果
                 HideCookingEffect();
             }
         }
 
         private void Update()
-        {
+        {            
+            // 在第三关且即将进入Burned状态时，不进行状态转换
+            if (LevelManager.Instance.CurrentLevelConfig.level == 3 && _cookState == CookState.Cooked)
+            {
+                _cookTime = 0;
+                _cookState = CookState.Burned;
+                HideCookingEffect();
+                return;
+            }
             //烤糊了就不允许再进行烤了
             if (_isStartGame && PlaceKitchenObject != null && _cookState != CookState.Burned)
             {
@@ -115,24 +147,96 @@ namespace ChaosKitchen.Items
             }
         }
 
+        private void LateUpdate()
+        {
+            _canvas.transform.forward = Camera.main.transform.forward;
+            _progressObject.transform.forward = Camera.main.transform.forward;
+        }
+
         private void Cook(float deltaTime)
         {
             _cookTime += deltaTime;
             if (_cookTime > _needCookTime)
             {
+                ReturnTaskShow();
+                SetRenderColor(true);
                 EnterNextCookState();
-                //进入下一个状态后改变颜色
-                _processImg.color = new Color(1, 0.35f, 0.14f, 1);
             }
-            _processImg.fillAmount = _cookTime / _needCookTime;
+            SetUpdateProgressShow();
         }
+
+        #region 新版进度条
+        private void SetUpdateProgressShow()
+        {
+            // 更新进度显示
+            if (_progressObject != null)
+            {
+                float currentTime = Time.time;
+                if (currentTime - _lastProgressUpdateTime >= 1f)
+                {
+                    _lastProgressUpdateTime = currentTime;
+
+                    // 重置所有子物体
+                    if (_currentActiveIndex > 12)
+                    {
+                        foreach (var segment in _progressSegments)
+                        {
+                            segment.SetActive(false);
+                        }
+                        _currentActiveIndex = 1;
+                    }
+
+                    // 激活当前索引的子物体
+                    _progressSegments[_currentActiveIndex].SetActive(true);
+                    AudioManager.Instance.PlayAudio(EventAudio.Scale); // 播放激活音效
+                    _currentActiveIndex++;
+                }
+            }
+        }
+
+        private void SetRenderColor(bool setC)
+        {
+            Color targetColor = setC ?
+                    new Color(1f, 0.168f, 0.14f, 1f) :  // 红色
+                    Color.green;   // 绿色
+            if (_progressSegments != null)
+            {
+                foreach (var segment in _progressSegments)
+                {
+                    segment.GetComponentInChildren<Renderer>().material.color = targetColor;
+                }
+            }
+        }
+
+        private void ReturnTaskShow()
+        {
+            // 重置进度显示
+            if (_progressSegments != null)
+            {
+                foreach (var segment in _progressSegments)
+                {
+                    segment.SetActive(false);
+                }
+            }
+            _currentActiveIndex = 0;
+            _lastProgressUpdateTime = 0f;
+        }
+        #endregion
 
         private void EnterNextCookState()
         {
-
             AudioManager.Instance.PlayAudio(EventAudio.Warn);
+
+
+
             //进入下一个状态
             _cookState = (CookState)((int)_cookState + 1);
+
+            // 在第二关且状态变为Cooked时，增加计数
+            if (LevelManager.Instance.CurrentLevelConfig.level == 2 && _cookState == CookState.Cooked)
+            {
+                _cookedCount++;
+            }
             _cookTime = 0;
             _needCookTime = KitchenObjectHelper.GetCookTime(PlaceKitchenObject.KitchenObjectType, stageOneTime, stageTwoTime);
 
@@ -158,9 +262,14 @@ namespace ChaosKitchen.Items
 
         private void ShowCookingEffect()
         {
-            SetGameObjectActive(_canvas.gameObject, true);
             SetGameObjectActive(_showCooking, true);
             SetGameObjectActive(_sizzlingParticles, true);
+            // 只在第二关烤熟次数小于3次时显示进度物体
+            if (LevelManager.Instance.CurrentLevelConfig.level != 2 || _cookedCount < 3)
+            {
+                SetGameObjectActive(_canvas.gameObject, true);
+                SetGameObjectActive(_progressObject, true);
+            }
             //播放声音
             AudioManager.Instance.PlayAudio(EventAudio.Sizzle);
         }
@@ -171,6 +280,7 @@ namespace ChaosKitchen.Items
             SetGameObjectActive(_showCooking, false);
             SetGameObjectActive(_sizzlingParticles, false);
             SetGameObjectActive(_warnUI, false);
+            SetGameObjectActive(_progressObject, false);
             //关闭声音
             AudioManager.Instance.StopAudio(EventAudio.Sizzle);
         }

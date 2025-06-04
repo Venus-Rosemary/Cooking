@@ -15,3 +15,6 @@ MonoBehaviour:
   menuName: "\u6C99\u62C9"
   recipe: 050000000d000000
   timeLimit: 20
+  extraIngredient: 0
+  hasExtraRequirement: 0
+  baseScore: 2

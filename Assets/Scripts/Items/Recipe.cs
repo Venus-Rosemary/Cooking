@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace ChaosKitchen.Items
 {
-    [CreateAssetMenu]
+    [CreateAssetMenu(menuName = "Recipe")]
     public sealed class Recipe : ScriptableObject
     {
         public string menuName;
@@ -15,5 +15,6 @@ namespace ChaosKitchen.Items
         [Header("额外食材需求")]
         public KitchenObjectType extraIngredient;    // 额外需要的食材
         public bool hasExtraRequirement;             // 是否有额外需求
+        public int baseScore = 1;  // 基础分数
     }
 }

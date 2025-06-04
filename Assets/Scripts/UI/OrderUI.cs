@@ -45,6 +45,7 @@ namespace ChaosKitchen.UI
             // 销毁所有计时器UI
             foreach (Transform menu in _showMenus)
             {
+                //menu.GetChild(0).GetComponent<Image>().color = new Color(0, 0, 0, 0.219f);
                 var timerIdentifier = menu.GetComponent<TimerIdentifier>();
                 if (timerIdentifier != null)
                 {
@@ -104,6 +105,28 @@ namespace ChaosKitchen.UI
             }
         }
 
+        private void UpdateMenuColors()
+        {
+            // 在第三关设置特定的颜色
+            if (LevelManager.Instance.CurrentLevelConfig.level == 3)
+            {
+                if (menuName1.Count != 0)
+                {
+                    for (int i = 0; i < menuName1.Count; i++)
+                    {
+                        if (i == 0)
+                        {
+                            menuName1[0].transform.parent.GetChild(0).GetComponent<Image>().color = new Color(0.431f, 0.902f, 0.4f, 0.5f); // #6EE666
+                        }
+                        else
+                        {
+                            menuName1[i].transform.parent.GetChild(0).GetComponent<Image>().color = new Color(0, 0, 0, 0.219f);
+                        }
+                    }
+                }
+            }
+        }
+
         private void ShowRecipeInfo(Recipe recipe, Transform menu)
         {
             TMP_Text menuNameTxt = menu.GetComponentInChildren<TMP_Text>();
@@ -134,9 +157,13 @@ namespace ChaosKitchen.UI
                 menus.GetChild(i).gameObject.SetActive(i < icons.Count);
                 if (i < icons.Count)
                 {
-                    menus.GetChild(i).GetComponent<Image>().sprite = KitchenManager.Instance.GetIcon(icons[i]);
+                    Image iconImage = menus.GetChild(i).GetComponent<Image>();
+                    iconImage.sprite = KitchenManager.Instance.GetIcon(icons[i]);
+                    Image menuImage = menus.GetComponent<Image>();
                 }
             }
+
+            UpdateMenuColors();
 
             // 如果是第三关，启动食材闪烁协程
             if (LevelManager.Instance.CurrentLevelConfig.level == 3) // 0-based index
@@ -196,7 +223,6 @@ namespace ChaosKitchen.UI
                 }
             }
 
-
             //移除对应菜单
             foreach (int timerId in timersToRemove)
             {
@@ -246,6 +272,9 @@ namespace ChaosKitchen.UI
                 // 移除菜单名称
                 _originalMenuNames.Remove(menuNameTxt);
                 menuName1.RemoveAt(index);
+                
+                // 更新菜单颜色
+                UpdateMenuColors();
             }
         }
 

@@ -17,8 +17,6 @@ namespace ChaosKitchen
         [Header("所有食谱")]
         [SerializeField] private List<Recipe> _recipes;
 
-        [SerializeField] private int ThirdPassCount=0;
-
         private bool _isStartGame;
         private float _timer;
 
@@ -28,12 +26,24 @@ namespace ChaosKitchen
         public int SuccessNum { get; private set; }
 
         /// <summary>
+        /// 玩家当前总分
+        /// </summary>
+        public int TotalScore { get; private set; }
+
+        /// <summary>
         /// 所有随机生成的菜单
         /// </summary>
-        [SerializeField] private List<Recipe> _menu = new(5);
+        private List<Recipe> _menu = new(5);
 
         // 最大订单数量变量
         private int _maxOrderCount;
+
+        [Header("特殊关卡的设置")]
+        [SerializeField] private int _levelIndex = 0;               // 特殊关卡索引
+        [SerializeField] private float[] _items = {20f, 15f, 10f};     // 菜单随波次间隔缩短        
+        //第三关完成的菜单数（不论对错）
+        private int ThirdPassCount = 0;
+
         public static OrderManager Instance { get; private set; }
 
 
@@ -80,6 +90,7 @@ namespace ChaosKitchen
             _orderUI.OnGameOver();
             _menu.Clear();
             SuccessNum = 0;
+            TotalScore = 0;  // 重置分数
             ThirdPassCount = 0;
         }
 
@@ -89,7 +100,6 @@ namespace ChaosKitchen
             {
                 if (_isStartGame && _menu.Count < _maxMenuCount  && LevelManager.Instance._completedOrders + _menu.Count < _maxOrderCount)
                 {
-                    Debug.Log(_maxOrderCount - LevelManager.Instance._completedOrders);
                     _timer += Time.deltaTime;
                     if (_timer >= _interval)
                     {
@@ -132,27 +142,27 @@ namespace ChaosKitchen
         {
             Recipe recipe = _recipes[Random.Range(0, _recipes.Count)];
 
-            if (LevelManager.Instance.CurrentLevelConfig.level == 3) 
+            if (LevelManager.Instance.CurrentLevelConfig.level == _levelIndex) 
             {
                 if (ThirdPassCount < 4)
                 {
                     recipe = _recipes[ThirdPassCount];
                     _orderUI.SetBlinkTime(6f, 5f);          // 食材显示、闪烁时间
-                    _interval = 5f;                        // 第三关菜单生成间隔
+                    _interval = _items[0];                        // 第三关菜单生成间隔
                     ThirdPassCount++;
                 }
                 else if (ThirdPassCount < 8)
                 {
-                    recipe = _recipes[Random.Range(0, 5)];
+                    recipe = _recipes[Random.Range(0, _recipes.Count)];
                     _orderUI.SetBlinkTime(4f, 4f);
-                    _interval = 3f;
+                    _interval = _items[1];
                     ThirdPassCount++;
                 }
                 else if (ThirdPassCount <12)
                 {
                     recipe = _recipes[Random.Range(0, _recipes.Count)];
                     _orderUI.SetBlinkTime(2f, 3f);
-                    _interval = 1f;
+                    _interval = _items[2];
                     ThirdPassCount++;
                 }
 
@@ -266,6 +276,14 @@ namespace ChaosKitchen
             if (isMatch)
             {
                 SuccessNum += 1;
+                // 计算分数：基础分数 + 额外需求分数
+                int score = firstRecipe.baseScore;
+                if (firstRecipe.hasExtraRequirement)
+                {
+                    score += 1;  // 有备注加1分
+                }
+                TotalScore += score;
+                Debug.Log($"获得{score}分，总分：{TotalScore}分");
             }
 
             EventManager.Instance.TriggerEvent(GameEvent.OrderCompleted);
@@ -324,10 +342,19 @@ namespace ChaosKitchen
 
                     if (isMatch)
                     {
-                        Debug.Log(i);
                         _orderUI.HideRecipeByIndex(i);
                         _menu.RemoveAt(i);
                         SuccessNum += 1;
+
+                        // 计算分数：基础分数 + 额外需求分数
+                        int score = recipe.baseScore;
+                        if (recipe.hasExtraRequirement)
+                        {
+                            score += 1;  // 有备注加1分
+                        }
+                        TotalScore += score;
+                        Debug.Log($"获得{score}分，总分：{TotalScore}分");
+
                         _orderCountUI?.UpdateOrderCount();
                         return true;
                     }

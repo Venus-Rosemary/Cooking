@@ -10,6 +10,8 @@ namespace ChaosKitchen.UI
         [SerializeField] private Button _continueBtn;
         [SerializeField] private TMP_Text _successTxt;
 
+        [SerializeField] private TMP_Text _scoreText;
+
         private void Awake()
         {
             EventManager.Instance.RegisterEvent(GameEvent.GameOver, GameOver);
@@ -21,6 +23,7 @@ namespace ChaosKitchen.UI
         {
             transform.GetChild(0).gameObject.SetActive(true);
             _successTxt.text = OrderManager.Instance.SuccessNum.ToString();
+            _scoreText.text = $"最终得分:{OrderManager.Instance.TotalScore}";
         }
 
         private void QuitGame()
